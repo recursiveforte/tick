@@ -334,6 +334,10 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		progressModel, cmd := m.progress.Update(msg)
 		m.progress = progressModel.(progress.Model)
 		return m, cmd
+
+	case metronomeOnMsg:
+		m.metronomeOn = bool(msg)
+
 	}
 
 	return m, nil
@@ -395,16 +399,16 @@ func (m model) metronomeTickerCmd() tea.Msg {
 	return metronomeTickMsg(<-m.ticker.C)
 }
 
+type metronomeOnMsg bool
+
 func (m model) updateTickerCmd() tea.Msg {
 	m.ticker.Reset(time.Minute / time.Duration(m.bpm))
-	m.metronomeOn = true
-	return nil
+	return metronomeOnMsg(true)
 }
 
 func (m model) stopTickerCmd() tea.Msg {
 	m.ticker.Stop()
-	m.metronomeOn = false
-	return nil
+	return metronomeOnMsg(false)
 }
 
 const metronomeFullColor = "#FFfe83"
